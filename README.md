@@ -1,7 +1,7 @@
 [![Build Status](https://img.shields.io/travis/AntiPhotonltd/kms-vault/master.svg)](https://travis-ci.org/AntiPhotonltd/kms-vault)
 [![Software License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Release](https://img.shields.io/github/release/AntiPhotonltd/kms-vault.svg)](https://github.com/AntiPhotonltd/kms-vault/releases/latest)
-[![Github commits (since latest release)](https://img.shields.io/github/commits-since/AntiPhotonltd/kms-vaule/latest.svg)](https://github.com/AntiPhotonltd/kms-vault/commits)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/AntiPhotonltd/kms-vault/latest.svg)](https://github.com/AntiPhotonltd/kms-vault/commits)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/AntiPhotonltd/kms-vault.svg)](https://github.com/AntiPhotonltd/kms-vault)
 [![GitHub contributors](https://img.shields.io/github/contributors/AntiPhotonltd/kms-vault.svg)](https://github.com/AntiPhotonltd/kms-vault)
 
@@ -20,13 +20,14 @@ The script has 3 operating modes:
 ## Usage
 
 ```
-  Usage: ./kms-vault.sh [ -hdel ] [ -k key alias ] [ -f filename ]
+  Usage: ./kms-vault.sh [ -hdel ] [ -k key alias ] [ -f input filename ] [ -o output filename ]
     -h    : Print this screen
     -d    : decrypt a given file
     -e    : encrypt a given file
     -f    : The name of the name to encrypt
     -k    : The alias for the key to encrypt with
     -l    : List the available KSM key aliases/names
+    -o    : Name of the output file
 ```
 
 <a name="list-keys"></a>
