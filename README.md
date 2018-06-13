@@ -19,14 +19,13 @@ The script has 3 operating modes:
 ## Usage
 
 ```
-  Usage: ./kms-vault.sh [ -hdel ] [ -k key alias ] [ -f filename ] [ -r region ]
+  Usage: ./kms-vault.sh [ -hdel ] [ -k key alias ] [ -f filename ]
     -h    : Print this screen
     -d    : decrypt a given file
     -e    : encrypt a given file
     -f    : The name of the name to encrypt
     -k    : The alias for the key to encrypt with
     -l    : List the available KSM key aliases/names
-    -r    : region
 ```
 
 <a name="list-keys"></a>
@@ -75,7 +74,7 @@ The output from the script will be the decrypted contains of the file, the outpu
 ## ToDo
 
 - [ ] Better validation and error handling
-- [ ] Make region optional rather than default to eu-west-1
+- [ ] Make region an option ??
 - [ ] Validate the region if one is provided
 - [ ] Allow an output file to be specificed and write the encrypted text to that
 - [ ] Have a debug mode / verbose mode
