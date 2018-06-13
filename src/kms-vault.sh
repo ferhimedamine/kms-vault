@@ -41,7 +41,7 @@ list_ksm_aliases()
         key_id=$(echo "${key_info}" | jq -r .TargetKeyId)
         alias=$(echo "${key_info}" | jq -r .AliasName)
 
-        if [[ ! -z "${key_id}" ]] && [[ "${key_id}" != "null" ]]; then
+        if [[ ! -z "${key_id}" ]] && [[ "${key_id}" != "null" ]] && [[ "${alias}" != alias/aws/* ]]; then
             printf '%s%s.%s %s\n' "${green}" "${ALIAS_COUNT}" "${reset}" "${alias}"
             ALIAS_COUNT=$((ALIAS_COUNT+1))
         fi
@@ -57,12 +57,19 @@ list_ksm_aliases()
 decrypt_file()
 {
     ciphertext_path=$1
+    output_filename=$2
 
     if ! [[ -f "${ciphertext_path}" ]]; then
         show_error "File ${ciphertext_path} not found - aborting decryption"
         return
     fi
-    aws kms decrypt --ciphertext-blob fileb://<(base64 --decode < "${ciphertext_path}") --output text --query Plaintext | base64 --decode
+
+    if [[ -z "${output_filename}" ]]; then
+        aws kms decrypt --ciphertext-blob fileb://<(base64 --decode < "${ciphertext_path}") --output text --query Plaintext | base64 --decode
+    else
+        aws kms decrypt --ciphertext-blob fileb://<(base64 --decode < "${ciphertext_path}") --output text --query Plaintext | base64 --decode > "${output_filename}"
+        printf '%sResults habe been written to: %s%s\n' "${green}" "${reset}" "${output_filename}"
+    fi
 }
 
 # Encrypt a file
@@ -75,6 +82,7 @@ encrypt_file()
 {
     plaintext_path=$1
     key_alias=$2
+    output_filename=$3
 
     if ! [[ -f "${plaintext_path}" ]]; then
         show_error "File ${plaintext_path} not found - aborting encryption"
@@ -82,13 +90,33 @@ encrypt_file()
     fi
 
     key_info=$(aws kms list-aliases | jq -r ".Aliases[] | select(.AliasName | contains (\"${key_alias}\"))")
+    keys=$(echo "$key_info" | jq -c '.' | wc -l)
+
+    if [[ "${keys}" == 0 ]]; then
+        abort_script "Key alias ${2} not found - aborting"
+    fi
+
+    if [[ "${keys}" -gt 1 ]]; then
+        abort_script "Key alias returned ${keys} keys - please be more specific - aborting"
+    fi
+
     key_id=$(echo "$key_info" | jq -r .TargetKeyId)
+    alias=$(echo "$key_info" | jq -r .AliasName)
+
+    if [[ "${alias}" == alias/aws/* ]]; then
+      abort_script "Key alias ${2} is an AWS managed key and cannot be used"
+    fi
 
     if [[ -z "${key_id}" ]] || [[ "${key_id}" == "null" ]]; then
         abort_script "Key alias ${2} has not TargetKeyId attribute - aborting"
     fi
 
-    aws kms encrypt --key-id "${key_id}" --plaintext "fileb://${plaintext_path}" --query CiphertextBlob --output text
+    if [[ -z "${output_filename}" ]]; then
+        aws kms encrypt --key-id "${key_id}" --plaintext "fileb://${plaintext_path}" --query CiphertextBlob --output text
+    else
+        aws kms encrypt --key-id "${key_id}" --plaintext "fileb://${plaintext_path}" --query CiphertextBlob --output text > "${output_filename}"
+        printf '%sResults habe been written to: %s%s\n' "${green}" "${reset}" "${output_filename}"
+    fi
 }
 
 # Utiltity Functions
@@ -257,13 +285,14 @@ check_prereqs()
 usage()
 {
 cat <<EOF
-  Usage: $0 [ -hdel ] [ -k key alias ] [ -f filename ]
+  Usage: $0 [ -hdel ] [ -k key alias ] [ -f input filename ] [ -o output filename ]
     -h    : Print this screen
     -d    : decrypt a given file
     -e    : encrypt a given file
     -f    : The name of the name to encrypt
     -k    : The alias for the key to encrypt with
     -l    : List the available KSM key aliases/names
+    -o    : Name of the output file
 EOF
     exit 1;
 }
@@ -282,7 +311,7 @@ process_input()
         usage
     fi
 
-    while getopts ":hdelf:k:" arg; do
+    while getopts ":hdelf:k:o:" arg; do
         case $arg in
             h)
                 usage;
@@ -301,6 +330,9 @@ process_input()
                 ;;
             k)
                 keyname=$OPTARG
+                ;;
+            o)
+                output_filename=$OPTARG
                 ;;
             :)
                 show_error "Option -$OPTARG requires an argument."
@@ -321,7 +353,7 @@ process_input()
         if [[ -z "${filename}" ]]; then
             abort_script "You must supply the filename for the encrypted text"
         fi
-        decrypt_file "${filename}"
+        decrypt_file "${filename}" "${output_filename}"
     elif [[ "${ENCRYPT}" = true ]]; then
         if [[ -z "${filename}" ]]; then
             abort_script "You must supply the filename for the encrypted text"
@@ -329,7 +361,7 @@ process_input()
         if [[ -z "${keyname}" ]]; then
             abort_script "You must supply the name for the key to use for encryption (use $0 -l for a list of available keys)"
         fi
-        encrypt_file "${filename}" "${keyname}"
+        encrypt_file "${filename}" "${keyname}" "${output_filename}"
     else
         abort_script "You must select decrypt (-d) or encrypt (-e)"
     fi

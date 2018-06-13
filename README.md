@@ -36,20 +36,22 @@ The script has 3 operating modes:
 ./kms-vault.sh -l
 
 Available Aliases:
-1. alias/aws/ebs
-2. alias/aws/lambda
-3. alias/aws/rds
-
+1. alias/puppet
 ```
 
-The alias name is used when encrypting the file contents. Not ALL KSM keys are listed, any key which doesnt have a TargetKeyId attribute cannot be used.
+The alias name is used when encrypting the file contents. Not ALL KSM keys are listed, the script will not use a key which is AWS managed or 
+any key which doesnt have a TargetKeyId attribute.
+
 It is also possible that attempts to use certain keys might well be meet with the following error:
 
 ```
 An error occurred (AccessDeniedException) when calling the Encrypt operation: <truncated output>
 ```
 
-This is due to IAM restrictions to certain keys espcially AWS self generated keys forthings like S3 and RDS. It is advised that you create your own KMS keys for encryption/decryption purposes.
+This is due to IAM restrictions to the key you are attempting to use, this normally happens with AWS managed keys forthings like S3 and RDS
+which is why the script excludes them.
+
+You are required to create your own KMS keys for encryption/decryption purposes. (A tool for creating this will be released shortly and the link placed here).
 
 <a name="encrypt-file"></a>
 
@@ -77,6 +79,6 @@ The output from the script will be the decrypted contains of the file, the outpu
 - [ ] Better validation and error handling
 - [ ] Make region an option ??
 - [ ] Validate the region if one is provided
-- [ ] Allow an output file to be specificed and write the encrypted text to that
+- [X] Allow an output file to be specificed and write the encrypted text to that
 - [ ] Have a debug mode / verbose mode
 
