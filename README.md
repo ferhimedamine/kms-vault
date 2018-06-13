@@ -8,7 +8,8 @@
 KMS Vault
 =========
 
-A bash script for managing secrets encrypted / decrypted via AWS KMS. The origin of the script was a requirement to protect eyaml keys at rest in a masterless puppet environment.
+A bash script for managing secrets encrypted / decrypted via AWS KMS. The origin of the script was a requirement to protect eyaml keys at rest in a masterless puppet environment and 
+was inspired by this [kms-vault gist](https://gist.github.com/hassy/96256cfde707fed40714c02b64f8049e)
 
 The script has 3 operating modes:
 
