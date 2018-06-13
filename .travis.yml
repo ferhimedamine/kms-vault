@@ -1,0 +1,35 @@
+matrix:
+  include:
+  - language: bash
+    os: linux
+    dist: precise
+    sudo: required
+    install:
+    - "./build/install.sh"
+    script:
+    - "./build/build.sh"
+  - language: bash
+    os: linux
+    dist: trusty
+    sudo: required
+    install:
+    - "./build/install.sh"
+    script:
+    - "./build/build.sh"
+  - language: bash
+    os: osx
+    dist: precise
+    sudo: required
+    install:
+    - "./build/install.sh"
+    script:
+    - "./build/build.sh"
+  - language: ruby
+    rvm: 2.2
+    before_script: gem install awesome_bot
+    script: find . -type f -name "*.md" | while read file; do awesome_bot $file --allow-redirect
+      --allow-dupe -w github.com/AntiPhotonltd/kms-vault/issues/; done
+notifications:
+  email: false
+  slack:
+    secure: cu3dlxfwwsBNRlvYSaEvimiRa3i6e0d8Sjb1MDCcrlBCLYlyQNs1O73Ju4J6aMqDFQc36SGOvAwhAOV8YraNOzU+1O43bMPLouzUxi4e0TaC2XJjNT7Gpu4tLuvBo+apdhKiWg4fEsaMC1GPTf5r/59jvEFkQ6v21VJHGpre5KoFoGTqqxEk52ccEnoasbcieRw54hrn13heG8032vsiamuu6cAAvVOKbCJmd3WlYaptV4jXlOQ7yspgI78tpYmUY9hrFmgvIvJyVpw19taA3XSuCPYRumKUCHbAdpd0f8o52rfsoVxT/zJWd5qwM3NS8gAguSf/ar0xejdasaZOwO3G1FmBoSmVa2a20mMhumGJqDONmNs3gB7ol9LtFKvlatPIAi0uYsjZX78GSkWbLm38p5EpzWgat9HhQRzsx/pNyckCWjs2tRPbREDLxj78sWHVoQwA1rOjRIV3pdmwQy7HgpO4CVw+t2LjM30sdLql7gn3Zn6obmuP5k3Cll6Ho1PzSpnHkS7xNVBXd78lKtgHh7gbkt9ibw/HUIQ76yqyyET9qZeqeZ3hVHdK83iESXTv8IhTbv8VbLF/AvLnAoLsnPR6x7y4ObscqI2ZKIo5/cjhT0TLyFVabK7kbSBmy1+3IUO++Or+PSGDTzPtC67+KeCt/9CY96KWUu7fdNc=
