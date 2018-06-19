@@ -49,8 +49,8 @@ It is also possible that attempts to use certain keys might well be meet with th
 An error occurred (AccessDeniedException) when calling the Encrypt operation: <truncated output>
 ```
 
-This is due to IAM restrictions to the key you are attempting to use, this normally happens with AWS managed keys forthings like S3 and RDS
-which is why the script excludes them.
+This is due to IAM restrictions to the key you are attempting to use, this normally happens with AWS managed keys like S3 and RDS which is why the script 
+excludes them, but may also occur if you have set the access permissions to your custom key to be to restrictive.
 
 You are required to create your own KMS keys for encryption/decryption purposes. (A tool for creating this will be released shortly and the link placed here).
 
@@ -59,7 +59,7 @@ You are required to create your own KMS keys for encryption/decryption purposes.
 ## Encrypt File
 
 ```
-./kms-vault.sh -e -f <input file> -k <key alias>
+./kms-vault.sh -e -f <input file> -k <key alias> -o <output file>
 ```
 
 The output from the script will be a long base64 encoded string, the output can be redirected to a file (an output file option is on the todo list)
@@ -69,11 +69,10 @@ The output from the script will be a long base64 encoded string, the output can 
 ## Decrypt File
 
 ```
-./kms-vault.sh -d -f <input file>
+./kms-vault.sh -d -f <input file> -o <output file>
 ```
 
 The output from the script will be the decrypted contains of the file, the output can be redirected to a file (an output file option is on the todo list)
-
 
 ## ToDo
 
@@ -82,4 +81,3 @@ The output from the script will be the decrypted contains of the file, the outpu
 - [ ] Validate the region if one is provided
 - [X] Allow an output file to be specificed and write the encrypted text to that
 - [ ] Have a debug mode / verbose mode
-
