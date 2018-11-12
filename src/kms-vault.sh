@@ -1,40 +1,44 @@
 #!/usr/bin/env bash
 
-# Description
-# --------------------------------------------------------------------------------
-# A bash script for managing secrets encrypted / decrypted via AWS KMS.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Description                                                                      #
+# -------------------------------------------------------------------------------- #
+# A bash script for managing secrets encrypted / decrypted via AWS KMS.            #
+# -------------------------------------------------------------------------------- #
 
-# Global Variabes
-# --------------------------------------------------------------------------------
-# Various global varibles - commented inline
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Global Variabes                                                                  #
+# -------------------------------------------------------------------------------- #
+# Various global varibles - commented inline.                                      #
+# -------------------------------------------------------------------------------- #
 
-SCRIPT_TITLE="KMS Vault - By AntiPhoton Limited"    # Pretty header
+SCRIPT_TITLE="KMS Vault"                            # Pretty header
 
 LIST_KEYS=false                                     # Flag for listing keys
 DECRYPT=false                                       # Flag for decryption
 ENCRYPT=false                                       # Flag for encryption
 
-# Required commands
-# --------------------------------------------------------------------------------
-# These commands MUST exist in order for tyhe script to correctly run.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Required commands                                                                #
+# -------------------------------------------------------------------------------- #
+# These commands MUST exist in order for tyhe script to correctly run.             #
+# -------------------------------------------------------------------------------- #
 
 COMMANDS=( "aws" "jq" )
 
-# List KSM Aliases
-# --------------------------------------------------------------------------------
-# This function will list all of the aliases that 'might' work, this means they
-# contain an attribute called 'TargetKeyId'. This does not mean they WILL work
-# but without that they definately will not.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# List KSM Aliases                                                                 #
+# -------------------------------------------------------------------------------- #
+# This function will list all of the aliases that 'might' work, this means they    #
+# contain an attribute called 'TargetKeyId'. This does not mean they WILL work     #
+# but without that they definately will not.                                       #
+# -------------------------------------------------------------------------------- #
 
 list_ksm_aliases()
 {
     ALIAS_COUNT=1
 
-    printf '%sAvailable Aliases:%s\n' "${green}" "${reset}"
+    show_success 'Available Aliases:'
 
     aws kms list-aliases | jq -cr ".Aliases[]" | while read -r key_info
     do
@@ -48,11 +52,12 @@ list_ksm_aliases()
     done
 }
 
-# Decrypt a file
-# --------------------------------------------------------------------------------
-# This function will take a the name of an encrypted file and attemp to decrypt
-# the contents.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Decrypt a file                                                                   #
+# -------------------------------------------------------------------------------- #
+# This function will take a the name of an encrypted file and attempt to decrypt   #
+# the contents.                                                                    #
+# -------------------------------------------------------------------------------- #
 
 decrypt_file()
 {
@@ -68,15 +73,16 @@ decrypt_file()
         aws kms decrypt --ciphertext-blob fileb://<(base64 --decode < "${ciphertext_path}") --output text --query Plaintext | base64 --decode
     else
         aws kms decrypt --ciphertext-blob fileb://<(base64 --decode < "${ciphertext_path}") --output text --query Plaintext | base64 --decode > "${output_filename}"
-        printf '%sResults habe been written to: %s%s\n' "${green}" "${reset}" "${output_filename}"
+        show_success 'Results habe been written to: %s' "${output_filename}"
     fi
 }
 
-# Encrypt a file
-# --------------------------------------------------------------------------------
-# This function will take a the name of a file and a ksm key alias and attemp to
-# encrypt the contents.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Encrypt a file                                                                   #
+# -------------------------------------------------------------------------------- #
+# This function will take a the name of a file and a ksm key alias and attempt to  #
+# encrypt the contents.                                                            #
+# -------------------------------------------------------------------------------- #
 
 encrypt_file()
 {
@@ -115,22 +121,24 @@ encrypt_file()
         aws kms encrypt --key-id "${key_id}" --plaintext "fileb://${plaintext_path}" --query CiphertextBlob --output text
     else
         aws kms encrypt --key-id "${key_id}" --plaintext "fileb://${plaintext_path}" --query CiphertextBlob --output text > "${output_filename}"
-        printf '%sResults habe been written to: %s%s\n' "${green}" "${reset}" "${output_filename}"
+        show_success 'Results habe been written to: %s' "${output_filename}"
     fi
 }
 
-# Utiltity Functions
-# --------------------------------------------------------------------------------
-# The following functions are all utility functions used within the script but
-# are not specific to the display of the colours and only serve to handle things
-# like, signal handling, user interface and command line option processing.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Utiltity Functions                                                               #
+# -------------------------------------------------------------------------------- #
+# The following functions are all utility functions used within the script but     #
+# are not specific to the display of the colours and only serve to handle things   #
+# like, signal handling, user interface and command line option processing.        #
+# -------------------------------------------------------------------------------- #
 
-# Signal Handling
-# --------------------------------------------------------------------------------
-# This function is execute when a SIGINT or SIGTERM is caught. It allows us to
-# exit the script nice and clean so do we not mess up the end users terminal.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Signal Handling                                                                  #
+# -------------------------------------------------------------------------------- #
+# This function is execute when a SIGINT or SIGTERM is caught. It allows us to     #
+# exit the script nice and clean so do we not mess up the end users terminal.      #
+# -------------------------------------------------------------------------------- #
 
 control_c()
 {
@@ -139,12 +147,13 @@ control_c()
     exit
 }
 
-# Init
-# --------------------------------------------------------------------------------
-# A simple init function which will setup anything that is needed at the start of
-# the script, for example set up the signal handler and work out the width of the
-# screen that we have available.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Init                                                                             #
+# -------------------------------------------------------------------------------- #
+# A simple init function which will setup anything that is needed at the start of  #
+# the script, for example set up the signal handler and work out the width of the  #
+# screen that we have available.                                                   #
+# -------------------------------------------------------------------------------- #
 
 init()
 {
@@ -152,18 +161,19 @@ init()
     trap control_c SIGTERM
 }
 
-# Check Colours
-# --------------------------------------------------------------------------------
-# This function will check to see if we are able to support colours and how many
-# we are able to support.
-#
-# The script will give and error and exit if there is no colour support or there
-# are less than 8 supported colours.
-#
-# Variables intentionally not defined 'local' as we want them to be global.
-#
-# NOTE: Do NOT use show_error for the error messages are it requires colour!
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Check Colours                                                                    #
+# -------------------------------------------------------------------------------- #
+# This function will check to see if we are able to support colours and how many   #
+# we are able to support.                                                          #
+#                                                                                  #
+# The script will give and error and exit if there is no colour support or there   #
+# are less than 8 supported colours.                                               #
+#                                                                                  #
+# Variables intentionally not defined 'local' as we want them to be global.        #
+#                                                                                  #
+# NOTE: Do NOT use show_error for the error messages are it requires colour!       #
+# -------------------------------------------------------------------------------- #
 
 check_colours()
 {
@@ -196,10 +206,11 @@ check_colours()
     reset=$(tput sgr0)
 }
 
-# Check Root
-# --------------------------------------------------------------------------------
-# If required ensure the script is running as the root user.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Check Root                                                                       #
+# -------------------------------------------------------------------------------- #
+# If required ensure the script is running as the root user.                       #
+# -------------------------------------------------------------------------------- #
 
 check_root()
 {
@@ -208,20 +219,22 @@ check_root()
     fi
 }
 
-# Show Header
-# --------------------------------------------------------------------------------
-# A simple wrapper function to show the script header to the user.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Show Header                                                                      #
+# -------------------------------------------------------------------------------- #
+# A simple wrapper function to show the script header to the user.                 #
+# -------------------------------------------------------------------------------- #
 
 show_header()
 {
     printf '%s%s%s%s\n' "${cls}" "${green}" "${SCRIPT_TITLE}" "${reset}"
 }
 
-# Abort Script
-# --------------------------------------------------------------------------------
-# A simple wrapper function to give an error and then exitthe script
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Abort Script                                                                     #
+# -------------------------------------------------------------------------------- #
+# A simple wrapper function to give an error and then exitthe script.              #
+# -------------------------------------------------------------------------------- #
 
 abort_script()
 {
@@ -229,10 +242,11 @@ abort_script()
     exit 1
 }
 
-# Show Error
-# --------------------------------------------------------------------------------
-# A simple wrapper function to show something was an error
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Show Error                                                                       #
+# -------------------------------------------------------------------------------- #
+# A simple wrapper function to show something was an error.                        #
+# -------------------------------------------------------------------------------- #
 
 show_error()
 {
@@ -241,10 +255,11 @@ show_error()
     fi
 }
 
-# Show Warning
-# --------------------------------------------------------------------------------
-# A simple wrapper function to show a warning
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Show Warning                                                                     #
+# -------------------------------------------------------------------------------- #
+# A simple wrapper function to show a warning.                                     #
+# -------------------------------------------------------------------------------- #
 
 show_warning()
 {
@@ -253,10 +268,24 @@ show_warning()
     fi
 }
 
-# Check Prerequisites
-# --------------------------------------------------------------------------------
-# Check to ensure that the prerequisite commmands exist.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Show Success                                                                     #
+# -------------------------------------------------------------------------------- #
+# A simple wrapper function to show a success.                                     #
+# -------------------------------------------------------------------------------- #
+
+show_success()
+{
+    if [[ ! -z $1 ]]; then
+        printf '%s%s%s\n' "${green}" "${1}" "${reset}"
+    fi
+}
+
+# -------------------------------------------------------------------------------- #
+# Check Prerequisites                                                              #
+# -------------------------------------------------------------------------------- #
+# Check to ensure that the prerequisite commmands exist.                           #
+# -------------------------------------------------------------------------------- #
 
 check_prereqs()
 {
@@ -277,10 +306,11 @@ check_prereqs()
     fi
 }
 
-# Usage (-h parameter)
-# --------------------------------------------------------------------------------
-# This function is used to show the user 'how' to use the script.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Usage (-h parameter)                                                             #
+# -------------------------------------------------------------------------------- #
+# This function is used to show the user 'how' to use the script.                  #
+# -------------------------------------------------------------------------------- #
 
 usage()
 {
@@ -297,13 +327,14 @@ EOF
     exit 1;
 }
 
-# Process Input
-# --------------------------------------------------------------------------------
-# This function will process the input from the command line and work out what it
-# is that the user wants to see.
-#
-# This is the main processing function where all the processing logic is handled.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Process Input                                                                    #
+# -------------------------------------------------------------------------------- #
+# This function will process the input from the command line and work out what it  #
+# is that the user wants to see.                                                   #
+#                                                                                  #
+# This is the main processing function where all the processing logic is handled.  #
+# -------------------------------------------------------------------------------- #
 
 process_input()
 {
@@ -367,10 +398,11 @@ process_input()
     fi
 }
 
-# Main()
-# --------------------------------------------------------------------------------
-# This is the actual 'script' and the functions/sub routines are called in order.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# Main()                                                                           #
+# -------------------------------------------------------------------------------- #
+# This is the actual 'script' and the functions/sub routines are called in order.  #
+# -------------------------------------------------------------------------------- #
 
 #check_root
 
@@ -379,8 +411,9 @@ check_colours
 check_prereqs
 process_input "$@"
 
-# End of Script
-# --------------------------------------------------------------------------------
-# This is the end - nothing more to see here.
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- #
+# End of Script                                                                    #
+# -------------------------------------------------------------------------------- #
+# This is the end - nothing more to see here.                                      #
+# -------------------------------------------------------------------------------- #
 
