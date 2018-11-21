@@ -1,3 +1,9 @@
+## 1.0.3 (November 21, 2018)
+
+CHANGES:
+
+* Only clone Travis Toolkit modules when required in travis build. ([@TGWolf][])
+
 ## 1.0.2 (November 12, 2018)
 
 CHANGES:
