@@ -1,3 +1,9 @@
+## 1.0.4 (Unreleased)
+
+CHANGES: 
+
+* Small tweak to ensure that show_error (etc) write to STDERR and not STDOUT. ([@TGWolf][])
+
 ## 1.0.3 (November 21, 2018)
 
 CHANGES:
