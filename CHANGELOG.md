@@ -1,4 +1,4 @@
-## 1.0.4 (Unreleased)
+## 1.0.4 (December 21, 2018)
 
 CHANGES: 
 
