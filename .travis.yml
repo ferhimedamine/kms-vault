@@ -10,7 +10,7 @@ matrix:
     install:
       - ./travis/shellcheck/install.sh
     script:
-      - ./travis/shellcheck/build.sh
+      - ./travis/shellcheck/scan.sh
   - language: ruby
     rvm: 2.2
     before_install:
@@ -19,7 +19,7 @@ matrix:
     install:
       - ./travis/awesomebot/install.sh
     script:
-      - ./travis/awesomebot/build.sh
+      - ./travis/awesomebot/scan.sh
 notifications:
   email: false
   slack:
