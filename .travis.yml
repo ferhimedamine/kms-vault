@@ -1,8 +1,7 @@
-sudo: required
-
 matrix:
   include:
   - language: bash
+    name: "Shellcheck (Bash)"
     os: linux
     before_install:
       - mkdir travis
@@ -12,7 +11,8 @@ matrix:
     script:
       - ./travis/shellcheck/scan.sh
   - language: ruby
-    rvm: 2.2
+    name: "Link Checker (rvm 2.6.1)"
+    rvm: 2.6.1
     before_install:
       - mkdir travis
       - git clone https://github.com/TravisToolbox/awesomebot-travis.git travis/awesomebot
